@@ -6,15 +6,11 @@ export default createConfigForNuxt({
   features: {
     // Rules for module authors
     tooling: true,
-    // Rules for formatting
-    stylistic: true,
   },
   dirs: {
-    src: [
-      './playground',
-    ],
+    src: ['./playground'],
   },
 })
-  .append(
-    // your custom flat config here...
-  )
+  .append
+  // your custom flat config here...
+  ()
