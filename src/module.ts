@@ -7,6 +7,7 @@ import {
 } from './runtime/drizzle/config'
 import { logger } from './runtime/utils/logger'
 import { extractDrizzleTables } from './runtime/drizzle/tables'
+import { extractRefinements } from './runtime/drizzle/refinements'
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
@@ -70,7 +71,9 @@ export default defineNuxtModule<ModuleOptions>({
       logger.info(`Found Drizzle schema at: ${absoluteSchemaPath}`)
 
       const drizzleTables = await extractDrizzleTables([absoluteSchemaPath])
+      const refinements = await extractRefinements([absoluteSchemaPath])
       console.log('Extracted Drizzle tables:', drizzleTables)
+      console.log('Extracted refinements:', refinements)
 
       // Add template to generate Zod schemas
       addTemplate({

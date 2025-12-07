@@ -1,11 +1,10 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { sql } from 'drizzle-orm'
-import {
-  createInsertSchema,
-  createSelectSchema,
-  createUpdateSchema,
-} from 'drizzle-zod'
-import type { z } from 'zod'
+import { createSchemaFactory } from 'drizzle-zod'
+import { z } from 'zod'
+
+const { createInsertSchema, createSelectSchema, createUpdateSchema } =
+  createSchemaFactory({ zodInstance: z })
 
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -17,16 +16,17 @@ export const users = sqliteTable('users', {
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()
     .default(sql`(unixepoch())`),
+  test: text('test').default('hello'),
 })
 
 export const insertUserSchema = createInsertSchema(users, {
   name: (schema) => schema.min(1, 'Name is required').max(100, 'Name too long'),
-  email: (schema) => schema.email('Invalid email address'),
+  email: () => z.email('Invalid email address'),
 })
 
 export const updateUserSchema = createUpdateSchema(users, {
   name: (schema) => schema.min(1, 'Name is required').max(100, 'Name too long'),
-  email: (schema) => schema.email('Invalid email address'),
+  email: () => z.email('Invalid email address'),
 })
 
 export const selectUserSchema = createSelectSchema(users)
