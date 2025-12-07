@@ -5,6 +5,7 @@ import {
   logger,
 } from '@nuxt/kit'
 import { defu } from 'defu'
+import { watch } from 'chokidar'
 import {
   findDrizzleConfig,
   getDrizzleSchemaPathFromConfig,
@@ -58,34 +59,46 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     if (!options.schemaPath) {
-      logger.error('Could not extract schema path from drizzle config.')
+      logger.error(
+        'Drizzle schema path is not defined. Please provide it in the module options or ensure it is specified in drizzle.config.'
+      )
       return
-    }
+    } else {
+      const schemaPath = options.schemaPath
+      const absoluteSchemaPath = resolver.resolve(projectRoot, schemaPath)
+      logger.info(`Found Drizzle schema at: ${absoluteSchemaPath}`)
 
-    logger.info(`Found Drizzle schema at: ${options.schemaPath}`)
+      // Add template to generate Zod schemas
+      addTemplate({
+        filename: 'drizzle-zod-gen.ts',
+        write: true,
+        async getContents(_data) {
+          return Promise.resolve('')
+        },
+      })
 
-    // Add template to generate Zod schemas
-    addTemplate({
-      filename: 'drizzle-zod-gen.ts',
-      write: true,
-      async getContents(_data) {
-        return Promise.resolve('')
-      },
-    })
+      // Watch for changes in the Drizzle schema files
+      if (nuxt.options.dev) {
+        const watcher = watch(absoluteSchemaPath, {
+          ignoreInitial: true,
+        })
 
-    // Watch for changes in the Drizzle schema files
-    nuxt.hook('builder:watch', async (event, relativePath) => {
-      // TODO: Path
-      if (relativePath.includes('server/db/schema')) {
-        console.log('Drizzle schema changed, regenerating zod schemas...')
-        // TODO update logic?
+        watcher.on('change', async (path) => {
+          logger.info(`Drizzle schema changed: ${path}`)
+          logger.info('Regenerating zod schemas...')
+          // TODO: Implement schema regeneration logic
+        })
+
+        nuxt.hook('close', () => {
+          watcher.close()
+        })
       }
-    })
 
-    // Register alias to access generated schemas
-    nuxt.options.alias['#schemas'] = resolver.resolve(
-      nuxt.options.buildDir,
-      'schemas'
-    )
+      // Register alias to access generated schemas
+      nuxt.options.alias['#schemas'] = resolver.resolve(
+        nuxt.options.buildDir,
+        'schemas'
+      )
+    }
   },
 })
