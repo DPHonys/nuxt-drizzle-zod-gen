@@ -18,11 +18,7 @@ function getErrorMessage(
   }
 }
 
-function formatMethodCall(
-  method: string,
-  value: z4.util.Numeric,
-  errorMessage?: string
-) {
+function formatMethodCall<T>(method: string, value: T, errorMessage?: string) {
   return errorMessage
     ? `.${method}(${value}, "${errorMessage}")`
     : `.${method}(${value})`
