@@ -10,11 +10,11 @@ TODO:
 - [x] Make zod validation work - somehow (drizzle-zod can take in validation schemas - Refinements)
 - [x] Write to file in .schemas?
 - [x] Add alias for imports - #schemas for importing the zod schemas
-- [ ] Support zod formats (currently turning email into string)
-- [ ] Test in playground - move drizzle stuff to server folder and import the generated schemas in client
+- [x] Test in playground - move drizzle stuff to server folder and import the generated schemas in client
+- [x] Support zod formats (currently turning email into string)
+- [ ] Add more zod 4 support
 - [ ] Cleanup code and proper logging
 - [ ] Write tests - make sure it works as expected, check if drizzle is in client bundle or not
-- [ ] Add more zod 4 support
 - [ ] Handle custom errors in checks
 - [ ] Write docs
 - [ ] Publish package
