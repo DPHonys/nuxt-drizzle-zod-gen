@@ -78,3 +78,7 @@ export function isZodReadonlyDef(def: unknown): def is z4.$ZodReadonlyDef {
     def.type === 'readonly'
   )
 }
+
+export function isStringFormatDef(def: unknown): def is z4.$ZodStringFormatDef {
+  return isZodCheckDef(def) && def.check === 'string_format'
+}

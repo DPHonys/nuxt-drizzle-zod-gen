@@ -1,5 +1,7 @@
 import type * as z4 from 'zod/v4/core'
 
+// TODO: does not make sense because these can accept params
+// TODO: remove types with formats
 export const basicTypeGenerators: Partial<
   Record<z4.$ZodTypeDef['type'], () => string>
 > = {

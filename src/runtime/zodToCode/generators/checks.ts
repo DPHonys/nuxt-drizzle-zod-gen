@@ -2,7 +2,7 @@ import type * as z4 from 'zod/v4/core'
 
 // TODO: this might not work with fully custom error maps
 
-function getErrorMessage(
+export function getErrorMessage(
   errorFn: z4.$ZodErrorMap<never> | undefined,
   code: string
 ) {

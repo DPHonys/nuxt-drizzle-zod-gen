@@ -16,19 +16,24 @@ import {
   isLengthEqualsCheckDef,
   isMaxLengthCheckDef,
   isMinLengthCheckDef,
+  isStringFormatDef,
   isZodGreaterThanCheckDef,
   isZodLessThanCheckDef,
 } from './guards'
 import { checkGenerators } from './generators/checks'
+import { formatTypeGenerator } from './generators/formats'
 
 export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
-  logger.info(`Processing field of type: ${field._zod.def.type}`)
   let baseType = ''
   const def = field._zod.def
   const type = def.type
 
   // Handle basic types
-  if (type in basicTypeGenerators) {
+  // TODO: number has formats - its not so basic after all
+  if (
+    type in basicTypeGenerators &&
+    ('check' in def === false || type === 'number')
+  ) {
     const generator = basicTypeGenerators[type]
     baseType = generator ? generator() : ''
   }
@@ -40,6 +45,7 @@ export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
   // Handle complex types
   else if (type in complexTypeGenerators) {
     const generator = complexTypeGenerators[type]
+    // TODO: no any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     baseType = generator ? generator(field as any, indent) : ''
   }
@@ -62,10 +68,18 @@ export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
   }
     */
 
+  if (isStringFormatDef(def)) {
+    baseType = formatTypeGenerator.string_format(def)
+  }
+
   // TODO Handle refinements
   if (def.checks) {
     for (const check of def.checks) {
       const checkDef = check._zod.def
+      logger.info(
+        `Processing check of type: ${checkDef.check}`,
+        JSON.stringify(checkDef)
+      )
       if (isMinLengthCheckDef(checkDef)) {
         baseType += checkGenerators.min_length(checkDef)
         continue
