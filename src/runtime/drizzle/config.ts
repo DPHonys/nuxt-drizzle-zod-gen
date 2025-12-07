@@ -1,4 +1,4 @@
-import { logger } from './logger'
+import { logger } from '../utils/logger'
 import { existsSync } from 'node:fs'
 import { loadFile } from 'magicast'
 import { join } from 'pathe'

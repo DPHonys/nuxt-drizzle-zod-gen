@@ -1,15 +1,12 @@
-import {
-  defineNuxtModule,
-  createResolver,
-  addTemplate,
-  logger,
-} from '@nuxt/kit'
+import { defineNuxtModule, createResolver, addTemplate } from '@nuxt/kit'
 import { defu } from 'defu'
 import { watch } from 'chokidar'
 import {
   findDrizzleConfig,
   getDrizzleSchemaPathFromConfig,
-} from './runtime/utils/drizzleConfig'
+} from './runtime/drizzle/config'
+import { logger } from './runtime/utils/logger'
+import { extractDrizzleTables } from './runtime/drizzle/tables'
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
@@ -58,6 +55,10 @@ export default defineNuxtModule<ModuleOptions>({
       schemaPath: drizzleSchemaPath,
     })
 
+    if (options.debug) {
+      logger.enable()
+    }
+
     if (!options.schemaPath) {
       logger.error(
         'Drizzle schema path is not defined. Please provide it in the module options or ensure it is specified in drizzle.config.'
@@ -67,6 +68,9 @@ export default defineNuxtModule<ModuleOptions>({
       const schemaPath = options.schemaPath
       const absoluteSchemaPath = resolver.resolve(projectRoot, schemaPath)
       logger.info(`Found Drizzle schema at: ${absoluteSchemaPath}`)
+
+      const drizzleTables = await extractDrizzleTables([absoluteSchemaPath])
+      console.log('Extracted Drizzle tables:', drizzleTables)
 
       // Add template to generate Zod schemas
       addTemplate({
@@ -84,8 +88,9 @@ export default defineNuxtModule<ModuleOptions>({
         })
 
         watcher.on('change', async (path) => {
-          logger.info(`Drizzle schema changed: ${path}`)
-          logger.info('Regenerating zod schemas...')
+          logger.info(
+            `Drizzle schema changed: ${path}. Regenerating zod schemas...`
+          )
           // TODO: Implement schema regeneration logic
         })
 
