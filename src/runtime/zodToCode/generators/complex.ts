@@ -6,6 +6,7 @@ import {
   isMaxLengthCheckDef,
   isMinLengthCheckDef,
 } from '../guards'
+import { validationCheckGenerators } from './validation'
 
 export const complexTypeGenerators: {
   [K in keyof ZodTypeDefMap]?: (
@@ -24,11 +25,11 @@ export const complexTypeGenerators: {
         const checkDef = check._zod.def
         console.log(check._zod.def)
         if (isMinLengthCheckDef(checkDef)) {
-          baseType += `.min(${checkDef.minimum})`
+          baseType += validationCheckGenerators.min_length(checkDef.minimum)
         } else if (isMaxLengthCheckDef(checkDef)) {
-          baseType += `.max(${checkDef.maximum})`
+          baseType += validationCheckGenerators.max_length(checkDef.maximum)
         } else if (isLengthEqualsCheckDef(checkDef)) {
-          baseType += `.length(${checkDef.length})`
+          baseType += validationCheckGenerators.length_equals(checkDef.length)
         }
       }
     }

@@ -9,9 +9,7 @@ export interface TableWithRefinements {
   refinements: TableRefinements
 }
 
-export async function extractTablesWithRefinements(
-  schemaFiles: string[]
-): Promise<Map<string, TableWithRefinements>> {
+export async function extractTablesWithRefinements(schemaFiles: string[]) {
   const [tables, refinements] = await Promise.all([
     extractDrizzleTables(schemaFiles),
     extractRefinements(schemaFiles),

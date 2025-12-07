@@ -22,6 +22,18 @@ export function isLengthEqualsCheckDef(
   return isZodCheckDef(def) && def.check === 'length_equals'
 }
 
+export function isZodGreaterThanCheckDef(
+  def: unknown
+): def is z4.$ZodCheckGreaterThanDef {
+  return isZodCheckDef(def) && def.check === 'greater_than'
+}
+
+export function isZodLessThanCheckDef(
+  def: unknown
+): def is z4.$ZodCheckLessThanDef {
+  return isZodCheckDef(def) && def.check === 'less_than'
+}
+
 export function isZodOptionalDef(def: unknown): def is z4.$ZodOptionalDef {
   return (
     typeof def === 'object' &&

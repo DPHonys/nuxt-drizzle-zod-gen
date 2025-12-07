@@ -1,4 +1,9 @@
-import { defineNuxtModule, createResolver, addTemplate } from '@nuxt/kit'
+import {
+  defineNuxtModule,
+  createResolver,
+  addTemplate,
+  updateTemplates,
+} from '@nuxt/kit'
 import { defu } from 'defu'
 import { watch } from 'chokidar'
 import {
@@ -6,7 +11,8 @@ import {
   getDrizzleSchemaPathFromConfig,
 } from './runtime/drizzle/config'
 import { logger } from './runtime/utils/logger'
-import { extractTablesWithRefinements } from './runtime/extract'
+import { generateAndWriteSchemas } from './runtime/generate'
+import { createRequire } from 'node:module'
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
@@ -69,17 +75,20 @@ export default defineNuxtModule<ModuleOptions>({
       const absoluteSchemaPath = resolver.resolve(projectRoot, schemaPath)
       logger.info(`Found Drizzle schema at: ${absoluteSchemaPath}`)
 
-      const tablesWithRefinements = await extractTablesWithRefinements([
-        absoluteSchemaPath,
-      ])
-      logger.debug('Extracted tables with refinements:', tablesWithRefinements)
+      // Get Zod instance from the user's project
+      const require = createRequire(projectRoot + '/')
+      let zod = require('zod')
+      // Fallback to dynamic import if require fails
+      if (!zod) {
+        zod = await import('zod')
+      }
 
       // Add template to generate Zod schemas
       addTemplate({
         filename: 'drizzle-zod-gen.ts',
         write: true,
         async getContents(_data) {
-          return Promise.resolve('')
+          return await generateAndWriteSchemas(absoluteSchemaPath, zod)
         },
       })
 
@@ -93,7 +102,10 @@ export default defineNuxtModule<ModuleOptions>({
           logger.info(
             `Drizzle schema changed: ${path}. Regenerating zod schemas...`
           )
-          // TODO: Implement schema regeneration logic
+          await updateTemplates({
+            filter: (t) => t.filename === 'drizzle-zod-gen.ts',
+          })
+          logger.success('Zod schemas regenerated successfully!')
         })
 
         nuxt.hook('close', () => {
@@ -102,9 +114,9 @@ export default defineNuxtModule<ModuleOptions>({
       }
 
       // Register alias to access generated schemas
-      nuxt.options.alias['#schemas'] = resolver.resolve(
+      nuxt.options.alias['#build/schemas'] = resolver.resolve(
         nuxt.options.buildDir,
-        'schemas'
+        'drizzle-zod-gen'
       )
     }
   },

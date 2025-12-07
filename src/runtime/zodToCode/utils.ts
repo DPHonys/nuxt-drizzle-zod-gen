@@ -6,11 +6,19 @@ import {
 } from './errors'
  */
 import { logger } from '../utils/logger'
+import { UnsupportedZodFunctionError } from './errors'
 import { basicTypeGenerators } from './generators/basic'
 import { complexTypeGenerators } from './generators/complex'
 import { modifierGenerators } from './generators/modifiers'
-//import { validationCheckGenerators } from './generators/validation'
+import { validationCheckGenerators } from './generators/validation'
 import type * as z4 from 'zod/v4/core'
+import {
+  isLengthEqualsCheckDef,
+  isMaxLengthCheckDef,
+  isMinLengthCheckDef,
+  isZodGreaterThanCheckDef,
+  isZodLessThanCheckDef,
+} from './guards'
 
 export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
   logger.info(`Processing field of type: ${field._zod.def.type}`)
@@ -51,20 +59,29 @@ export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
   } else {
     throw new UnsupportedZodTypeError(typeName)
   }
+    */
 
-  // Handle refinements
+  // TODO Handle refinements
   if (def.checks) {
     for (const check of def.checks) {
-      if (check.kind in validationCheckGenerators) {
-        baseType += validationCheckGenerators[
-          check.kind as keyof typeof validationCheckGenerators
-        ](check.value ?? check.regex)
-      } else {
-        throw new UnsupportedZodFunctionError(check.kind)
+      const checkDef = check._zod.def
+      if (checkDef.check in validationCheckGenerators) {
+        if (isMinLengthCheckDef(checkDef)) {
+          baseType += validationCheckGenerators.min_length(checkDef.minimum)
+        } else if (isMaxLengthCheckDef(checkDef)) {
+          baseType += validationCheckGenerators.max_length(checkDef.maximum)
+        } else if (isLengthEqualsCheckDef(checkDef)) {
+          baseType += validationCheckGenerators.length_equals(checkDef.length)
+        } else if (isZodGreaterThanCheckDef(checkDef)) {
+          baseType += validationCheckGenerators.greater_than(checkDef.value)
+        } else if (isZodLessThanCheckDef(checkDef)) {
+          baseType += validationCheckGenerators.less_than(checkDef.value)
+        } else {
+          throw new UnsupportedZodFunctionError(checkDef.check)
+        }
       }
     }
   }
-    */
 
   return baseType
 }

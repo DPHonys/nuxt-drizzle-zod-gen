@@ -2,6 +2,7 @@ import { is, Table, getTableName } from 'drizzle-orm'
 import { createJiti } from 'jiti'
 import { resolve } from 'pathe'
 import { logger } from '../utils/logger'
+import { pascalCase } from 'scule'
 
 export interface DrizzleTable {
   name: string
@@ -17,6 +18,7 @@ function isDrizzleTable(value: unknown): value is Table {
 export async function extractDrizzleTables(schemaFiles: string[]) {
   const jiti = createJiti(import.meta.url, {
     interopDefault: true,
+    moduleCache: false,
   })
 
   const tables = new Map<string, DrizzleTable>()
@@ -31,8 +33,9 @@ export async function extractDrizzleTables(schemaFiles: string[]) {
         continue
       }
 
-      for (const [exportName, value] of Object.entries(module)) {
+      for (const [name, value] of Object.entries(module)) {
         if (isDrizzleTable(value)) {
+          const exportName = pascalCase(name)
           const tableName = getTableName(value)
 
           tables.set(exportName, {
