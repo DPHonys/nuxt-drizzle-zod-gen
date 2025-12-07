@@ -1,4 +1,4 @@
-import { insertUserSchema } from '#shared/database/schema'
+import { insertUserSchema } from '~/server/database/schema'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
 
 export default defineEventHandler(async (event) => {

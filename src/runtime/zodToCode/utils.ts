@@ -19,6 +19,7 @@ import {
   isZodGreaterThanCheckDef,
   isZodLessThanCheckDef,
 } from './guards'
+import { checkGenerators } from './generators/checks'
 
 export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
   logger.info(`Processing field of type: ${field._zod.def.type}`)
@@ -65,10 +66,16 @@ export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
   if (def.checks) {
     for (const check of def.checks) {
       const checkDef = check._zod.def
+      if (isMinLengthCheckDef(checkDef)) {
+        baseType += checkGenerators.min_length(checkDef)
+        continue
+      } else if (isMaxLengthCheckDef(checkDef)) {
+        baseType += checkGenerators.max_length(checkDef)
+        continue
+      }
+
       if (checkDef.check in validationCheckGenerators) {
-        if (isMinLengthCheckDef(checkDef)) {
-          baseType += validationCheckGenerators.min_length(checkDef.minimum)
-        } else if (isMaxLengthCheckDef(checkDef)) {
+        if (isMaxLengthCheckDef(checkDef)) {
           baseType += validationCheckGenerators.max_length(checkDef.maximum)
         } else if (isLengthEqualsCheckDef(checkDef)) {
           baseType += validationCheckGenerators.length_equals(checkDef.length)

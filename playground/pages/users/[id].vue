@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { insertUserSchema } from '#shared/database/schema'
+import { UsersInsertSchema } from '#build/schemas'
 import type { FormErrorEvent } from '@nuxt/ui'
 import type { z } from 'zod'
 
-type UserFormData = z.output<typeof insertUserSchema>
-
+type UserFormData = z.output<typeof UsersInsertSchema>
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
@@ -38,6 +37,12 @@ if (!isNew.value) {
 }
 
 async function onSubmit() {
+  // Validate form before submitting
+  const validation = UsersInsertSchema.safeParse(state)
+  if (!validation.success) {
+    return
+  }
+
   submitting.value = true
   formErrors.value = []
 
@@ -104,7 +109,8 @@ function onError(event: FormErrorEvent) {
 }
 
 const isFormValid = computed(() => {
-  const result = insertUserSchema.safeParse(state)
+  const result = UsersInsertSchema.safeParse(state)
+  console.log('Form valid:', result)
   return result.success
 })
 </script>
@@ -127,7 +133,7 @@ const isFormValid = computed(() => {
 
     <UCard>
       <UForm
-        :schema="insertUserSchema"
+        :schema="UsersInsertSchema"
         :state="state"
         class="space-y-4"
         @submit="onSubmit"

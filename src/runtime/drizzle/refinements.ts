@@ -2,6 +2,7 @@ import { loadFile, generateCode } from 'magicast'
 import { visit } from 'recast'
 import type { ASTNode } from 'magicast'
 import { logger } from '../utils/logger'
+import { pascalCase } from 'scule'
 
 export interface TableRefinements {
   select?: string
@@ -32,7 +33,7 @@ export async function extractRefinements(schemaFiles: string[]) {
             const [tableArg, refinementArg] = node.init.arguments
 
             if (tableArg?.type === 'Identifier' && refinementArg) {
-              const tableName = tableArg.name
+              const tableName = pascalCase(tableArg.name)
               const schemaType =
                 match[1].toLowerCase() as keyof TableRefinements
 

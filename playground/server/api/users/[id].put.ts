@@ -1,4 +1,4 @@
-import { updateUserSchema } from '#shared/database/schema'
+import { updateUserSchema } from '~/server/database/schema'
 import { eq, tables, useDrizzle } from '~/server/utils/drizzle'
 
 export default defineEventHandler(async (event) => {

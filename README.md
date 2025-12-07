@@ -14,6 +14,7 @@ TODO:
 - [ ] Cleanup code and proper logging
 - [ ] Write tests - make sure it works as expected, check if drizzle is in client bundle or not
 - [ ] Add more zod 4 support
+- [ ] Handle custom errors in checks
 - [ ] Write docs
 - [ ] Publish package
 - [ ] Release
