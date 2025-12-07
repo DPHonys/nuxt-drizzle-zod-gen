@@ -3,7 +3,7 @@
 TODO:
 
 - [x] Setup Playground with drizzle in shared folder (just to test - it's not ideal solution.. thats why we need to make the gen module :-] )
-- [ ] Get Drizzle schema - preferably from Drizzle config if possible otherwise module option
+- [x] Get Drizzle schema - preferably from Drizzle config if possible otherwise module option
 - [ ] Watch for changes - use Nuxt hooks
 - [ ] Generate Zod schemas - use drizzle-zod + zod-to-code
 - [ ] Make zod validation work - somehow (drizzle-zod can take in validation schemas - Refinements)
