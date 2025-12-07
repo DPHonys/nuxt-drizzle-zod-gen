@@ -14,6 +14,9 @@ importers:
       recast:
         specifier: ^0.23.11
         version: 0.23.11
+      zod:
+        specifier: '>=4.0.0'
+        version: 4.1.13
     devDependencies:
       '@nuxt/devtools':
         specifier: ^3.1.1
@@ -45,6 +48,9 @@ importers:
       drizzle-orm:
         specifier: ^0.45.0
         version: 0.45.0
+      drizzle-zod:
+        specifier: ^0.8.3
+        version: 0.8.3(drizzle-orm@0.45.0)(zod@4.1.13)
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
@@ -2474,6 +2480,12 @@ packages:
       sqlite3:
         optional: true
 
+  drizzle-zod@0.8.3:
+    resolution: {integrity: sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: ^3.25.0 || ^4.0.0
+
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
 
@@ -4724,6 +4736,9 @@ packages:
   zip-stream@6.0.1:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
+
+  zod@4.1.13:
+    resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -7130,6 +7145,11 @@ snapshots:
   dotenv@17.2.3: {}
 
   drizzle-orm@0.45.0: {}
+
+  drizzle-zod@0.8.3(drizzle-orm@0.45.0)(zod@4.1.13):
+    dependencies:
+      drizzle-orm: 0.45.0
+      zod: 4.1.13
 
   duplexer@0.1.2: {}
 
@@ -9709,5 +9729,7 @@ snapshots:
       archiver-utils: 5.0.2
       compress-commons: 6.0.2
       readable-stream: 4.7.0
+
+  zod@4.1.13: {}
 
   zwitch@2.0.4: {}

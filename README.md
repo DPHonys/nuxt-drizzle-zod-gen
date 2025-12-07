@@ -21,4 +21,5 @@ TODO:
 - [ ] Get feedback
 - [ ] Improve
 - [ ] Profit
+- [ ] Add more zod 4 support
 - [ ] ??? (Have fun!)
