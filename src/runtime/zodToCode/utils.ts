@@ -8,7 +8,11 @@ import {
 import { logger } from '../utils/logger'
 import { UnsupportedZodFunctionError } from './errors'
 import { basicTypeGenerators } from './generators/basic'
-import { complexTypeGenerators } from './generators/complex'
+import {
+  complexTypeGenerators,
+  complexTypeGenerators2,
+  isComplexType,
+} from './generators/complex'
 import { modifierGenerators } from './generators/modifiers'
 import { validationCheckGenerators } from './generators/validation'
 import type * as z4 from 'zod/v4/core'
@@ -27,6 +31,9 @@ export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
   let baseType = ''
   const def = field._zod.def
   const type = def.type
+  if (type === 'string') {
+    logger.info(`Processing Zod type: ${type}`, JSON.stringify(def), def)
+  }
 
   // Handle basic types
   // TODO: number has formats - its not so basic after all
@@ -42,12 +49,20 @@ export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
     const generator = modifierGenerators[type]
     return generator ? generator(field, indent) : ''
   }
-  // Handle complex types
+  // Handle complex types with old generators
   else if (type in complexTypeGenerators) {
     const generator = complexTypeGenerators[type]
     // TODO: no any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     baseType = generator ? generator(field as any, indent) : ''
+  }
+  // Handle complex types with type-safe generators
+  else if (isComplexType(type)) {
+    const entry = complexTypeGenerators2[type]
+    if (entry) {
+      // TODO: can throw
+      baseType = entry.generator(field, indent)
+    }
   }
   /*
   // Handle effects
@@ -76,10 +91,6 @@ export function zodFieldToString<T extends z4.$ZodType>(field: T, indent = 0) {
   if (def.checks) {
     for (const check of def.checks) {
       const checkDef = check._zod.def
-      logger.info(
-        `Processing check of type: ${checkDef.check}`,
-        JSON.stringify(checkDef)
-      )
       if (isMinLengthCheckDef(checkDef)) {
         baseType += checkGenerators.min_length(checkDef)
         continue

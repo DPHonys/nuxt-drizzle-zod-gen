@@ -16,11 +16,13 @@ export const users = sqliteTable('users', {
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()
     .default(sql`(unixepoch())`),
+  test: text('test').default('default_value'),
 })
 
 export const insertUserSchema = createInsertSchema(users, {
   name: (schema) => schema.min(1, 'Name is required').max(100, 'Name too long'),
   email: z.email('Invalid email address'),
+  test: z.string(),
 })
 
 export const updateUserSchema = createUpdateSchema(users, {

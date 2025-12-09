@@ -6,7 +6,10 @@ export {
   UnsupportedZodTypeError,
 } from './errors'
 
-export function zodToCode<T extends z4.$ZodType>(zodObject: T, indent = 0) {
+export function generateZodCode<T extends z4.$ZodType>(
+  zodObject: T,
+  indent = 0
+) {
   const def = zodObject._zod.def
 
   if (def.type === 'object') {

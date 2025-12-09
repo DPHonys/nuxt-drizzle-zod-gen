@@ -12,10 +12,10 @@ TODO:
 - [x] Add alias for imports - #schemas for importing the zod schemas
 - [x] Test in playground - move drizzle stuff to server folder and import the generated schemas in client
 - [x] Support zod formats (currently turning email into string)
-- [ ] Add more zod 4 support
 - [ ] Cleanup code and proper logging
-- [ ] Write tests - make sure it works as expected, check if drizzle is in client bundle or not
 - [ ] Handle custom errors in checks
+- [ ] Add more zod 4 support
+- [ ] Write tests - make sure it works as expected, check if drizzle is in client bundle or not
 - [ ] Write docs
 - [ ] Publish package
 - [ ] Release

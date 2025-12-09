@@ -13,6 +13,8 @@ import {
 import { logger } from './runtime/utils/logger'
 import { generateAndWriteSchemas } from './runtime/generate'
 import { createRequire } from 'node:module'
+import { generateZodCode } from './runtime/zod'
+import z from 'zod'
 
 // Module options TypeScript interface definition
 export interface ModuleOptions {
@@ -112,6 +114,8 @@ export default defineNuxtModule<ModuleOptions>({
           watcher.close()
         })
       }
+
+      generateZodCode(z.string()) // Example usage to avoid unused import
 
       // Register alias to access generated schemas
       nuxt.options.alias['#build/schemas'] = resolver.resolve(

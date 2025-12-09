@@ -2,11 +2,63 @@ import type * as z4 from 'zod/v4/core'
 import { zodFieldToString } from '../utils'
 import type { ZodTypeDefMap } from '../types'
 import {
+  hasZodType,
   isLengthEqualsCheckDef,
   isMaxLengthCheckDef,
   isMinLengthCheckDef,
 } from '../guards'
 import { validationCheckGenerators } from './validation'
+
+export function isComplexType(
+  type: string
+): type is keyof typeof complexTypeGenerators2 {
+  return type in complexTypeGenerators2
+}
+
+function createComplexGenerator<T extends z4.$ZodType>(
+  guard: (schema: unknown) => schema is T,
+  generator: (field: T, indent: number) => string
+) {
+  return {
+    guard,
+    generator: (field: z4.$ZodType, indent: number) => {
+      if (guard(field)) {
+        return generator(field, indent)
+      }
+      throw new Error(
+        `Invalid field for complex generator of type '${field._zod.def.type}'`
+      )
+    },
+  }
+}
+
+export const complexTypeGenerators2 = {
+  array: createComplexGenerator(
+    (schema: unknown): schema is z4.$ZodArray => hasZodType(schema, 'array'),
+    (field: z4.$ZodArray, indent: number) => {
+      const def = field._zod.def
+      const elementSchema = def.element
+      let baseType = `z.array(${zodFieldToString(elementSchema, indent)})`
+      const checks = def.checks || []
+
+      // TODO: use checkGenerators
+      if (checks.length) {
+        for (const check of checks) {
+          const checkDef = check._zod.def
+          console.log(check._zod.def)
+          if (isMinLengthCheckDef(checkDef)) {
+            baseType += validationCheckGenerators.min_length(checkDef.minimum)
+          } else if (isMaxLengthCheckDef(checkDef)) {
+            baseType += validationCheckGenerators.max_length(checkDef.maximum)
+          } else if (isLengthEqualsCheckDef(checkDef)) {
+            baseType += validationCheckGenerators.length_equals(checkDef.length)
+          }
+        }
+      }
+      return baseType
+    }
+  ),
+} as const
 
 export const complexTypeGenerators: {
   [K in keyof ZodTypeDefMap]?: (
@@ -20,6 +72,7 @@ export const complexTypeGenerators: {
     let baseType = `z.array(${zodFieldToString(elementSchema, indent)})`
     const checks = def.checks || []
 
+    // TODO: use checkGenerators
     if (checks.length) {
       for (const check of checks) {
         const checkDef = check._zod.def
